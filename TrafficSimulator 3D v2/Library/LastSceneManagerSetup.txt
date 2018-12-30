@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Scenes/Iasi.unity
+- path: Assets/Scenes/TudorVladimirescu 1.unity
   isLoaded: 1
   isActive: 1

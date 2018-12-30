@@ -5,8 +5,8 @@ using System.Collections.Generic;
 public class CarEngine : MonoBehaviour
 {
     public Waypoint start;
-    private Waypoint _currentNode;
-    private Waypoint _nextNode;
+    public Waypoint _currentNode;
+    public Waypoint _nextNode;
     private Waypoint _previousNode;
     private bool _setNodes = false;
 
@@ -58,6 +58,7 @@ public class CarEngine : MonoBehaviour
     public float backSensorAngle = 10f;
 
     public bool IsStop = false;
+    public bool RoundAbout = false;
     private bool _carAhead = false;
     private bool _reverse = false;
     private bool _avoiding = false;
@@ -71,7 +72,8 @@ public class CarEngine : MonoBehaviour
     private float delay = 0;
     private Rigidbody _rb;
 
-    [HideInInspector]
+    public float ANGLE = 0;
+    public bool _priority = false;
     public bool GoForward = false;
     public bool GoLeft = false;
     public bool GoRight = false;
@@ -88,11 +90,13 @@ public class CarEngine : MonoBehaviour
         SetDirection();
 
         _rb = GetComponent<Rigidbody>();
-        
+
     }
 
     private void FixedUpdate()
     {
+        
+
         if (_spawned == true)
             SpeedBooster();
 
@@ -101,15 +105,20 @@ public class CarEngine : MonoBehaviour
         IsTooFast();
         Braking();
         SpeedoMeter();
-        Sensors();
-        CitySensors();
+        PrioritySensors();
+        //AvoidingSensors();
         //Reverse();
         LerpSteerAngle();
     }
 
-    private void Sensors()
+    private void AvoidingSensors()
     {
+        float avoidCounter = 0f;
+        _avoiding = false;
+        _reverse = false;
 
+        if (_priority)
+            return;
         RaycastHit hit;
         Color colorSensor = new Color();
         Vector3 sensorsStartPosition = transform.position;
@@ -119,11 +128,6 @@ public class CarEngine : MonoBehaviour
         Vector3 backSensorsStartPosition = transform.position;
         backSensorsStartPosition += transform.forward * backSensorsPosition.z; // are aceeasi directie ca si masina
         backSensorsStartPosition += transform.up * backSensorsPosition.y; // se afla la aceeasi inaltime indiferent de pozitia masinii
-
-        float avoidCounter = 0f;
-        _avoiding = false;
-        _reverse = false;
-
 
         // Pozitionez senzori
         sensorsStartPosition += transform.right * frontSidePosition;
@@ -156,7 +160,7 @@ public class CarEngine : MonoBehaviour
                     colorSensor = Color.green;
                 }
 
-                Debug.DrawLine(sensorsStartPosition, hit.point, colorSensor);
+                //Debug.DrawLine(sensorsStartPosition, hit.point, colorSensor);
                 _avoiding = true;
                 avoidCounter -= 0.5f;
             }
@@ -190,7 +194,7 @@ public class CarEngine : MonoBehaviour
                     colorSensor = Color.green;
                 }
 
-                Debug.DrawLine(sensorsStartPosition, hit.point, colorSensor);
+                //Debug.DrawLine(sensorsStartPosition, hit.point, colorSensor);
                 _avoiding = true;
                 avoidCounter -= 0.25f;
             }
@@ -219,7 +223,7 @@ public class CarEngine : MonoBehaviour
                     colorSensor = Color.green;
                 }
 
-                Debug.DrawLine(backSensorsStartPosition, hit.point, colorSensor);
+                //Debug.DrawLine(backSensorsStartPosition, hit.point, colorSensor);
                 _avoiding = true;
                 avoidCounter -= 0.15f;
             }
@@ -227,10 +231,10 @@ public class CarEngine : MonoBehaviour
         }
 
         // Left First Sensor
-        sensorsStartPosition -= 2* indexFront * transform.right * frontSidePosition;
+        sensorsStartPosition -= 2 * indexFront * transform.right * frontSidePosition;
         if (Physics.Raycast(sensorsStartPosition, transform.forward, out hit, frontSensorsLength))
         {
-             if (!hit.collider.CompareTag("WayPoint") && hit.collider.CompareTag("Car"))
+            if (!hit.collider.CompareTag("WayPoint") && hit.collider.CompareTag("Car"))
             {
                 float distance = Vector3.Distance(sensorsStartPosition, hit.point);
 
@@ -253,7 +257,7 @@ public class CarEngine : MonoBehaviour
                     colorSensor = Color.green;
                 }
 
-                Debug.DrawLine(sensorsStartPosition, hit.point, colorSensor);
+                //Debug.DrawLine(sensorsStartPosition, hit.point, colorSensor);
                 _avoiding = true;
                 avoidCounter += 0.5f;
             }
@@ -286,7 +290,7 @@ public class CarEngine : MonoBehaviour
                     colorSensor = Color.green;
                 }
 
-                Debug.DrawLine(sensorsStartPosition, hit.point, colorSensor);
+                //Debug.DrawLine(sensorsStartPosition, hit.point, colorSensor);
                 _avoiding = true;
                 avoidCounter += 0.25f;
             }
@@ -296,7 +300,7 @@ public class CarEngine : MonoBehaviour
         // Left Side Sensor
 
         // Back First Left Sensor
-        backSensorsStartPosition -= 2 * indexBack* transform.right * backSidePosition;
+        backSensorsStartPosition -= 2 * indexBack * transform.right * backSidePosition;
         if (Physics.Raycast(backSensorsStartPosition, Quaternion.AngleAxis(-backSensorAngle, transform.up) * transform.forward, out hit, backSensorsLength))
         {
             //if (hit.collider.CompareTag("Terrain") || hit.collider.CompareTag("Car"))
@@ -317,7 +321,7 @@ public class CarEngine : MonoBehaviour
                     colorSensor = Color.green;
                 }
 
-                Debug.DrawLine(backSensorsStartPosition, hit.point, colorSensor);
+                //Debug.DrawLine(backSensorsStartPosition, hit.point, colorSensor);
                 _avoiding = true;
                 avoidCounter += 0.15f;
             }
@@ -355,7 +359,7 @@ public class CarEngine : MonoBehaviour
                     }
 
 
-                    Debug.DrawLine(sensorsStartPosition, hit.point, colorSensor);
+                    //Debug.DrawLine(sensorsStartPosition, hit.point, colorSensor);
                     _avoiding = true;
                     if (hit.normal.x < 0)
                         avoidCounter = -1f;
@@ -374,8 +378,9 @@ public class CarEngine : MonoBehaviour
 
     }
 
-    private void CitySensors()
+    private void PrioritySensors()
     {
+        _priority = false;
         _isCarAhead = false;
         float newDim = 0;
         if (CurrentSpeed < 50 && CurrentSpeed > 40)
@@ -431,7 +436,7 @@ public class CarEngine : MonoBehaviour
                     colorSensor = Color.blue;
                 }
 
-                Debug.DrawLine(sensorsStartPosition, hit.point, colorSensor);
+                //Debug.DrawLine(sensorsStartPosition, hit.point, colorSensor);
                 _isCarAhead = true;
                 return;
             }
@@ -439,36 +444,39 @@ public class CarEngine : MonoBehaviour
 
         // Pozitionez senzori
         sensorsStartPosition += transform.right * frontSidePosition0;
-        
-            // First Right Sensor
-            if ( Physics.Raycast(sensorsStartPosition, transform.forward, out hit, frontSensorsLength0 / 2) )
+
+        // First Right 
+        if (Physics.Raycast(sensorsStartPosition, transform.forward, out hit, frontSensorsLength0 / 2))
+        {
+            if (hit.collider.CompareTag("Car") && GoRight)
             {
-                if ( hit.collider.CompareTag("Car") )
+
+                _priority = SetPriority(hit.collider.gameObject);
+
+                float distance = Vector3.Distance(sensorsStartPosition, hit.point);
+
+                if (distance < 3f / 6)
                 {
-                    float distance = Vector3.Distance(sensorsStartPosition, hit.point);
+                    _reverse = true;
+                }
 
-                    if (distance < 3f / 6)
-                    {
-                        _reverse = true;
-                    }
+                if (distance < 3f / 3)
+                {
+                    colorSensor = Color.red;
+                }
+                else if (distance < 3f / 2)
+                {
+                    colorSensor = Color.yellow;
+                }
+                else
+                {
+                    colorSensor = Color.blue;
+                }
 
-                    if (distance < 3f / 3)
-                    {
-                        colorSensor = Color.red;
-                    }
-                    else if (distance < 3f / 2)
-                    {
-                        colorSensor = Color.yellow;
-                    }
-                    else
-                    {
-                        colorSensor = Color.blue;
-                    }
-                    Debug.DrawLine(sensorsStartPosition, hit.point, colorSensor);
-
-                Debug.DrawLine(sensorsStartPosition, hit.point, colorSensor);
+                //Debug.DrawLine(sensorsStartPosition, hit.point, colorSensor);
                 _isCarAhead = true;
-            }          
+                return;
+            }
         }
 
 
@@ -476,20 +484,26 @@ public class CarEngine : MonoBehaviour
         sideSensorsStartPosition += transform.right * SidePosition;
         if (Physics.Raycast(sideSensorsStartPosition, Quaternion.AngleAxis(90, transform.up) * transform.forward, out hit, sideSensorsLength))
         {
-            if (!hit.collider.CompareTag("WayPoint") && hit.collider.CompareTag("Car"))
-                Debug.DrawLine(sideSensorsStartPosition, hit.point, Color.blue);
+            if (!hit.collider.CompareTag("WayPoint") && hit.collider.CompareTag("Car") && GoRight)
+            {
+                //Debug.DrawLine(sideSensorsStartPosition, hit.point, Color.blue);
+                _priority = SetPriority(hit.collider.gameObject);
+                _isCarAhead = true;
+                return;
+            }
 
         }
 
         // Left First Sensor
         sensorsStartPosition -= 2 * FrontOVF * transform.right * frontSidePosition0;
-        if ( Physics.Raycast(sensorsStartPosition, transform.forward, out hit, frontSensorsLength0 / 2) )
+        if (Physics.Raycast(sensorsStartPosition, transform.forward, out hit, frontSensorsLength0 / 2))
         {
-            if (hit.collider.CompareTag("Car"))
+            if (hit.collider.CompareTag("Car") && GoLeft)
             {
+                _priority = SetPriority(hit.collider.gameObject);
                 float distance = Vector3.Distance(sensorsStartPosition, hit.point);
 
-                if (distance  < 3f / 6)
+                if (distance < 3f / 6)
                 {
                     _reverse = true;
                 }
@@ -509,23 +523,28 @@ public class CarEngine : MonoBehaviour
 
                 Debug.DrawLine(sensorsStartPosition, hit.point, colorSensor);
                 _isCarAhead = true;
-            }          
+                return;
+            }
         }
 
         // Left Side Sensor
         sideSensorsStartPosition -= 2 * transform.right * SidePosition;
         if (Physics.Raycast(sideSensorsStartPosition, Quaternion.AngleAxis(-90, transform.up) * transform.forward, out hit, sideSensorsLength))
         {
-            if (!hit.collider.CompareTag("WayPoint") && hit.collider.CompareTag("Car"))
-                Debug.DrawLine(sideSensorsStartPosition, hit.point, Color.blue);
+            if (!hit.collider.CompareTag("WayPoint") && hit.collider.CompareTag("Car") && GoLeft)
+            {
+                //Debug.DrawLine(sideSensorsStartPosition, hit.point, Color.blue);
+                _priority = SetPriority(hit.collider.gameObject);
+                _isCarAhead = true;
+                return;
+            }
 
         }
-
     }
 
     private void SpeedBooster()
     {
-        if (delay > 3.0f)
+        if (delay > 2.0f)
         {
             _spawned = false;
         }
@@ -537,7 +556,7 @@ public class CarEngine : MonoBehaviour
         if (_spawned == true)
             MotorTorque = 300;
         else
-            MotorTorque = MotorTorque/2;
+            MotorTorque = MotorTorque / 3;
     }
 
     private void ApplySteer()
@@ -546,17 +565,18 @@ public class CarEngine : MonoBehaviour
             return;
 
         float distance = Vector3.Distance(gameObject.transform.position, _currentNode.transform.position);
+        //Debug.DrawLine(gameObject.transform.position, _currentNode.transform.position);
         GetAngle();
 
-        if ( (distance < 2f) && _setNodes)
+        if ((distance < 2f) && _setNodes)
         {
-            _setNodes = false;           
+            _setNodes = false;
             SetDirection();
             SetNodes();
         }
         else
             _setNodes = true;
-            
+
 
         Vector3 relativeVector = transform.InverseTransformPoint(_currentNode.transform.position);
 
@@ -566,6 +586,7 @@ public class CarEngine : MonoBehaviour
         float newSteer = (relativeVector.x / relativeVector.magnitude) * DA;
         _targetSteerAngle = newSteer;
 
+        ANGLE = _targetSteerAngle;
         WheelFL.steerAngle = newSteer;
         WheelFL.steerAngle = newSteer;
     }
@@ -578,7 +599,7 @@ public class CarEngine : MonoBehaviour
 
     private void IsTooFast()
     {
-        if ( ( (_angle < 150f)  || (_angle > 210) ) && (CurrentSpeed > 10))
+        if (((_angle < 150f) || (_angle > 210)) && (CurrentSpeed > 10))
             _isTooFast = true;
         else
             _isTooFast = false;
@@ -586,6 +607,9 @@ public class CarEngine : MonoBehaviour
 
     private void Drive()
     {
+        if (_priority)
+            _isCarAhead = false;
+
         if (ForcedBraking == true)
         {
             _isBraking = true;
@@ -593,7 +617,7 @@ public class CarEngine : MonoBehaviour
             _isCarAhead = false;
             _isTooFast = false;
         }
-            
+
         else
         {
             if (IsStop)
@@ -605,6 +629,11 @@ public class CarEngine : MonoBehaviour
             else
                 _isBraking = false;
         }
+
+        if (RoundAbout)
+            MaxSpeed = 50;
+        else
+            MaxSpeed = 100;
     }
 
     private void Reverse()
@@ -626,7 +655,7 @@ public class CarEngine : MonoBehaviour
             WheelBR.brakeTorque = BrakingTorque;
 
             WheelFL.motorTorque = 0;
-            WheelFR.motorTorque = 0;          
+            WheelFR.motorTorque = 0;
         }
         else
         {
@@ -659,13 +688,14 @@ public class CarEngine : MonoBehaviour
 
     private void SetDirection()
     {
-        if (_angle <= 100)
+        
+        if (_targetSteerAngle > 5)
         {
             GoRight = true;
             GoLeft = false;
             GoForward = false;
         }
-        else if(_angle >= 280)
+        else if (_targetSteerAngle < -5)
         {
             GoLeft = true;
             GoRight = false;

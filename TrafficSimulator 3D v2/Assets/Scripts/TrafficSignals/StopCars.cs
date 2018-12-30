@@ -37,7 +37,7 @@ public class StopCars : MonoBehaviour
     // Cand vad semaforul
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("Collider Enter");
+        //Debug.Log("Collider Enter");
         //Debug.Log(other.name);
         //Debug.Log(other.tag);
         //Debug.Log(other.transform.parent.gameObject.name);
@@ -58,7 +58,7 @@ public class StopCars : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        Debug.Log("Collider Stay");
+        //Debug.Log("Collider Stay");
         if (other.gameObject.tag == "Car")
         {
 

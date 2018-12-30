@@ -93,6 +93,7 @@
     <Compile Include="Assets\Scripts\CarAI\CarEngine.cs" />
     <Compile Include="Assets\Scripts\CarAI\CarWheel.cs" />
     <Compile Include="Assets\Scripts\CarController\SimpleCarController.cs" />
+    <Compile Include="Assets\Scripts\CityGenerator\CityGenerator.cs" />
     <Compile Include="Assets\Scripts\Graph\Core\Scripts\DrawArrow.cs" />
     <Compile Include="Assets\Scripts\Graph\Core\Scripts\ReadOnlyAttribute.cs" />
     <Compile Include="Assets\Scripts\Graph\Core\Scripts\Waypoint.cs" />
@@ -100,17 +101,14 @@
     <Compile Include="Assets\Scripts\Graph\Demo Scenes\Scripts\findPath.cs" />
     <Compile Include="Assets\Scripts\Graph\Demo Scenes\Scripts\predefinedPath.cs" />
     <Compile Include="Assets\Scripts\Graph\Demo Scenes\Scripts\randomPath.cs" />
-    <Compile Include="Assets\Scripts\MapImporter\MapReader.cs" />
-    <Compile Include="Assets\Scripts\MapImporter\Serialization\BaseOsm.cs" />
-    <Compile Include="Assets\Scripts\MapImporter\Serialization\MercatorProjection.cs" />
-    <Compile Include="Assets\Scripts\MapImporter\Serialization\OsmBounds.cs" />
-    <Compile Include="Assets\Scripts\MapImporter\Serialization\OsmNode.cs" />
-    <Compile Include="Assets\Scripts\MapImporter\Serialization\OsmWay.cs" />
     <Compile Include="Assets\Scripts\Path\Path.cs" />
-    <Compile Include="Assets\Scripts\Serializationn\Node.cs" />
+    <Compile Include="Assets\Scripts\Settings.cs" />
+    <Compile Include="Assets\Scripts\Spawner\Spawner.cs" />
+    <Compile Include="Assets\Scripts\TrafficSignals\RoundABout.cs" />
     <Compile Include="Assets\Scripts\TrafficSignals\StopCars.cs" />
     <Compile Include="Assets\Scripts\TrafficSignals\TrafficSignals.cs" />
     <Compile Include="Assets\Scripts\TrafficSignals\TrafficSignalsManager.cs" />
+    <None Include="Assets\City\Simple\Urban Buildings Pack 1\runesimple.shader" />
     <None Include="Assets\Environment\Day-Night Skyboxes\readme.txt" />
     <None Include="Assets\RoadArchitect\Shaders\GSDTransparentWithShadowsZ.shader" />
     <None Include="Assets\RoadArchitect\Shaders\GSDShoulderDirt.shader" />
@@ -123,6 +121,7 @@
     <None Include="Assets\Resources\City\PoduRos.txt" />
     <None Include="Assets\RoadArchitect\LICENSE.txt" />
     <None Include="Assets\Environment\Day-Night Skyboxes\Textures\Readme for Assigning.txt" />
+    <None Include="Assets\RoadArchitect\Materials\Markers\Textures\NewSurfaceShader.shader" />
     <None Include="Assets\Cars\Racing\readme.txt" />
     <None Include="Assets\RoadArchitect\Shaders\GSDShoulderDirtDX11.shader" />
     <None Include="Assets\RoadArchitect\Shaders\GSDRoadShaderDX11.shader" />
