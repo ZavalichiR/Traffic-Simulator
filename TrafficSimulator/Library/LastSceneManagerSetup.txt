@@ -1,0 +1,4 @@
+sceneSetups:
+- path: Assets/Scripts/MachineLearning/MachineLearning.unity
+  isLoaded: 1
+  isActive: 1
